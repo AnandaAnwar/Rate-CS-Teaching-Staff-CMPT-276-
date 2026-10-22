@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:fragment="pageHead(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | Rate CS Teaching Staff'">Rate CS Teaching Staff</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&amp;family=Source+Serif+4:wght@600;700&amp;display=swap">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header class="site" th:fragment="siteHeader">
+    <div class="inner">
+        <a class="brand" th:href="@{/ratings}">Rate CS Teaching Staff</a>
+        <a class="btn" th:href="@{/ratings/new}">Add a rating</a>
+    </div>
+</header>
+<div th:fragment="flashMessages">
+    <div class="flash success" role="status" th:if="${message}" th:text="${message}"></div>
+    <div class="flash error" role="alert" th:if="${error}" th:text="${error}"></div>
+</div>
+</body>
+</html>

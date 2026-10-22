@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments :: pageHead(title='Rating details')}"></head>
+<body>
+<header th:replace="~{fragments :: siteHeader}"></header>
+<main>
+    <div th:replace="~{fragments :: flashMessages}"></div>
+
+    <div class="card">
+        <div class="detail-head">
+            <div class="score large"
+                 th:classappend="${rating.overallScore >= 8} ? 'good' : (${rating.overallScore >= 5} ? 'mid' : 'low')">
+                <span class="sr-only">Overall score</span>
+                <span class="score-num" th:text="${#numbers.formatDecimal(rating.overallScore, 1, 1)}">8.7</span>
+                <span class="score-of">/ 10</span>
+            </div>
+            <div>
+                <h1 th:text="${rating.profile.displayTitle()}">Name</h1>
+                <p class="rating-meta">
+                    <span class="tag" th:classappend="'role-' + ${rating.roleType.name()}" th:text="${rating.roleType.label}">Role</span>
+                    <span th:text="${rating.email}">email</span>
+                </p>
+            </div>
+        </div>
+
+        <p class="sub" th:text="${rating.profile.roleDescription()}">Role description</p>
+
+        <ul class="meters">
+            <li>
+                <span class="meter-label">Clarity</span>
+                <span class="meter-track"><span class="meter-fill" th:style="'width:' + ${rating.clarity * 10} + '%'"></span></span>
+                <span class="meter-value" th:text="${rating.clarity}">8</span>
+            </li>
+            <li>
+                <span class="meter-label">Niceness</span>
+                <span class="meter-track"><span class="meter-fill" th:style="'width:' + ${rating.niceness * 10} + '%'"></span></span>
+                <span class="meter-value" th:text="${rating.niceness}">9</span>
+            </li>
+            <li>
+                <span class="meter-label">Knowledgeable</span>
+                <span class="meter-track"><span class="meter-fill" th:style="'width:' + ${rating.knowledgeableScore * 10} + '%'"></span></span>
+                <span class="meter-value" th:text="${rating.knowledgeableScore}">10</span>
+            </li>
+        </ul>
+
+        <h2>Comment</h2>
+        <p class="comment" th:if="${rating.comment != null}" th:text="${rating.comment}">comment</p>
+        <p class="hint" th:if="${rating.comment == null}">No comment was left.</p>
+
+        <dl class="facts" th:if="${rating.createdAt != null}">
+            <dt>Added</dt>
+            <dd th:text="${#temporals.format(rating.createdAt, 'yyyy-MM-dd HH:mm')}">date</dd>
+            <dt>Last updated</dt>
+            <dd th:text="${#temporals.format(rating.updatedAt, 'yyyy-MM-dd HH:mm')}">date</dd>
+        </dl>
+
+        <div class="toolbar">
+            <a class="btn" th:href="@{/ratings/{id}/edit(id=${rating.id})}">Edit</a>
+            <a class="btn secondary" th:href="@{/ratings/{id}/delete(id=${rating.id})}">Delete</a>
+            <a class="btn secondary" th:href="@{/ratings}">Back to all ratings</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments :: pageHead(title=${pageTitle})}"></head>
+<body>
+<header th:replace="~{fragments :: siteHeader}"></header>
+<main>
+    <h1 th:text="${pageTitle}">Add a rating</h1>
+
+    <form class="card" method="post" novalidate th:action="@{${formAction}}" th:object="${rating}">
+        <div class="flash error" role="alert" th:if="${#fields.hasAnyErrors()}">
+            Some fields need your attention. Fix the errors below and save again.
+        </div>
+
+        <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" th:field="*{name}" th:errorclass="invalid" maxlength="200">
+            <p class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+        </div>
+
+        <div class="field">
+            <label for="email">Email</label>
+            <input type="text" id="email" th:field="*{email}" th:errorclass="invalid" inputmode="email" autocomplete="off">
+            <p class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+        </div>
+
+        <div class="field">
+            <label for="roleType">Role</label>
+            <select id="roleType" th:field="*{roleType}" th:errorclass="invalid">
+                <option value="">Choose a role</option>
+                <option th:each="role : ${roles}" th:value="${role}" th:text="${role.label}">Role</option>
+            </select>
+            <p class="error" th:if="${#fields.hasErrors('roleType')}" th:errors="*{roleType}"></p>
+        </div>
+
+        <div class="scores">
+            <div class="field">
+                <label for="clarity">Clarity (1-10)</label>
+                <input type="text" id="clarity" th:field="*{clarity}" th:errorclass="invalid" inputmode="numeric">
+                <p class="error" th:if="${#fields.hasErrors('clarity')}" th:errors="*{clarity}"></p>
+            </div>
+            <div class="field">
+                <label for="niceness">Niceness (1-10)</label>
+                <input type="text" id="niceness" th:field="*{niceness}" th:errorclass="invalid" inputmode="numeric">
+                <p class="error" th:if="${#fields.hasErrors('niceness')}" th:errors="*{niceness}"></p>
+            </div>
+            <div class="field">
+                <label for="knowledgeableScore">Knowledgeable (1-10)</label>
+                <input type="text" id="knowledgeableScore" th:field="*{knowledgeableScore}" th:errorclass="invalid" inputmode="numeric">
+                <p class="error" th:if="${#fields.hasErrors('knowledgeableScore')}" th:errors="*{knowledgeableScore}"></p>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="comment">Comment (optional)</label>
+            <textarea id="comment" rows="4" th:field="*{comment}" th:errorclass="invalid"></textarea>
+            <p class="hint">Up to 500 characters.</p>
+            <p class="error" th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}"></p>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn" type="submit">Save rating</button>
+            <a class="btn secondary" th:href="@{/ratings}">Cancel</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>
