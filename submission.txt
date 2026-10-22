@@ -1,0 +1,11 @@
+Assignment 2 - Rate CS Teaching Staff
+
+Render URL: PASTE_YOUR_RENDER_URL_HERE
+GitHub repository URL: https://github.com/AnandaAnwar/Rate-CS-Teaching-Staff-CMPT-276-
+
+Known Issues / Future Work
+- Ratings of the same person (same email) are listed as separate entries. They are not combined into one entry with an average score.
+- There is no per-person page listing all ratings for one person with their comments and dates.
+- There is no login: anyone can edit or delete any rating.
+- The database table is created by Hibernate (ddl-auto=update); a real project would use migrations such as Flyway.
+- Render's free plan sleeps when idle, so the first page load can take up to a minute.

@@ -1,0 +1,116 @@
+package com.example.ratecsstaff.repository;
+
+import com.example.ratecsstaff.model.RoleType;
+import com.example.ratecsstaff.model.StaffRating;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * 3) Persistence tests. @DataJpaTest loads only the JPA layer and swaps in an in-memory
+ * H2 database, so these never touch the real PostgreSQL database.
+ */
+@DataJpaTest
+class StaffRatingRepositoryTest {
+
+    @Autowired
+    private StaffRatingRepository repository;
+
+    @PersistenceContext
+    private EntityManager em;
+
+    private static StaffRating sample(String name) {
+        StaffRating r = new StaffRating();
+        r.setName(name);
+        r.setEmail(name.toLowerCase().replace(' ', '.') + "@sfu.ca");
+        r.setRoleType(RoleType.TA);
+        r.setClarity(6);
+        r.setNiceness(7);
+        r.setKnowledgeableScore(8);
+        r.setComment("ok");
+        return r;
+    }
+
+    /** Forces a real write/read round trip instead of returning the cached entity. */
+    private void flushAndClear() {
+        em.flush();
+        em.clear();
+    }
+
+    @Test
+    void savingAndRetrievingAnEntryWorks() {
+        StaffRating saved = repository.save(sample("Ada Lovelace"));
+        flushAndClear();
+
+        assertThat(saved.getId()).isNotNull();
+        StaffRating found = repository.findById(saved.getId()).orElseThrow();
+        assertThat(found.getName()).isEqualTo("Ada Lovelace");
+        assertThat(found.getEmail()).isEqualTo("ada.lovelace@sfu.ca");
+        assertThat(found.getRoleType()).isEqualTo(RoleType.TA);
+        assertThat(found.getClarity()).isEqualTo(6);
+        assertThat(found.getNiceness()).isEqualTo(7);
+        assertThat(found.getKnowledgeableScore()).isEqualTo(8);
+        assertThat(found.getComment()).isEqualTo("ok");
+    }
+
+    @Test
+    void timestampsAreFilledInOnSave() {
+        StaffRating saved = repository.save(sample("Grace Hopper"));
+        flushAndClear();
+
+        StaffRating found = repository.findById(saved.getId()).orElseThrow();
+        assertThat(found.getCreatedAt()).isNotNull();
+        assertThat(found.getUpdatedAt()).isNotNull();
+    }
+
+    @Test
+    void deleteRemovesTheEntry() {
+        StaffRating saved = repository.save(sample("Alan Turing"));
+        flushAndClear();
+
+        repository.deleteById(saved.getId());
+        flushAndClear();
+
+        assertThat(repository.findById(saved.getId())).isEmpty();
+        assertThat(repository.existsById(saved.getId())).isFalse();
+    }
+
+    @Test
+    void updatingAnEntryPersistsTheChange() {
+        StaffRating saved = repository.save(sample("Edsger Dijkstra"));
+        flushAndClear();
+
+        StaffRating loaded = repository.findById(saved.getId()).orElseThrow();
+        loaded.setNiceness(2);
+        repository.save(loaded);
+        flushAndClear();
+
+        assertThat(repository.findById(saved.getId()).orElseThrow().getNiceness()).isEqualTo(2);
+    }
+
+    @Test
+    void findAllReturnsEverySavedEntry() {
+        repository.save(sample("Person One"));
+        repository.save(sample("Person Two"));
+        flushAndClear();
+
+        List<StaffRating> all = repository.findAllByOrderByCreatedAtDesc();
+        assertThat(all).extracting(StaffRating::getName).containsExactlyInAnyOrder("Person One", "Person Two");
+    }
+
+    @Test
+    void sameEmailCanBeRatedMoreThanOnce() {
+        // Our documented rule: email is NOT unique (many students can rate the same person).
+        repository.save(sample("Ada Lovelace"));
+        repository.save(sample("Ada Lovelace"));
+        flushAndClear();
+
+        assertThat(repository.findAll()).hasSize(2);
+    }
+}
